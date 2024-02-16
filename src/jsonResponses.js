@@ -19,11 +19,19 @@ const notFound = (request, response) => {
   return respondJSON(request, response, 404, responseJSON);
 };
 
+const notFoundMeta = (request, response) => {
+  respondJSONMeta(request, response, 404);
+};
+
 const getUsers = (request, response) => {
   const responseJSON = {
     users,
   };
   respondJSON(request, response, 200, responseJSON);
+};
+
+const getUsersMeta = (request, response) => {
+  respondJSONMeta(request, response, 200);
 };
 
 const addUser = (request, response, body) => {
@@ -56,4 +64,6 @@ module.exports = {
   getUsers,
   addUser,
   notFound,
+  notFoundMeta,
+  getUsersMeta,
 };

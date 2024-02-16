@@ -5,9 +5,8 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
-    const handleResponse = async (response) => {
+    const handleResponse = async (response, parseResponse) => {
       const content = document.querySelector('#content');
-      console.log(response);
       switch(response.status) {
         case 200: //success
           content.innerHTML = `<b>Success</b>`;
@@ -22,18 +21,23 @@
           content.innerHTML = `<b>Bad Request</b>`;
           break;
         default: //any other status code
-          content.innerHTML = `Error code not implemented by client.`;
+          content.innerHTML = `<b>Not Found</b>`;
           break;
       }
 
-      let obj = await response.json();
-      console.log(obj);
 
-      if (obj.message) {
-        content.innerHTML += `<p>${obj.message}</p>`
+      if (parseResponse) {
+        let obj = await response.json();
+        console.log(obj);
+
+        if (obj.message) {
+          content.innerHTML += `<p>Messege: ${obj.message}</p>`;
+        }
+
+        if (obj.users) {
+          content.innerHTML += `<p>${JSON.stringify(obj.users)}</[]>`;
+        }
       }
-
-      //if (obj)
     }
 
     const sendPost = async (nameForm) => {
@@ -54,23 +58,24 @@
         body: formData,
       });
 
-      handleResponse(response);
+      handleResponse(response, nameMethod === 'post');
     };
 
-    const sendGet = async (userForm) => {
-        const url = userForm.getAttribute('action');
+    const sendGet = async () => {
+        const url = document.querySelector('#urlField').value;
+        const method = document.querySelector('#methodSelect').value;
         let response = await fetch(url, {
-          method: 'get',
+          method: method,
           headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
           }
         })
-        handleResponse(response);
+        handleResponse(response, method === 'get');
       }
 
     const init = () => {
       const nameForm = document.querySelector('#nameForm');
-      const userForm = document.querySelector('#userForm');
 
       const addUser = (e) => {
         e.preventDefault();
@@ -78,8 +83,14 @@
         return false;
       }
 
+      const getUser = (e) => {
+        e.preventDefault();
+        sendGet();
+        return false
+      }
+
       nameForm.addEventListener('submit', addUser);
-      userForm.addEventListener('submit', function() {sendGet(userForm)});
+      userForm.addEventListener('submit', getUser);
     }
 
     window.onload = init;

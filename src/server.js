@@ -44,16 +44,24 @@ const handleGet = (request, response, parsedUrl) => {
   }
 };
 
+const handleHead = (request, response, parsedUrl) => {
+  if (parsedUrl.pathname === '/getUsers') {
+    jsonHandler.getUsersMeta(request, response);
+  } else {
+    jsonHandler.notFoundMeta(request, response);
+  }
+};
+
 const onRequest = (request, response) => {
   console.log(request.url);
   const parsedUrl = url.parse(request.url);
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
-  } else {
+  } else if (request.method === 'GET') {
     handleGet(request, response, parsedUrl);
+  } else {
+    handleHead(request, response, parsedUrl);
   }
-
-  // not found code
 };
 
 http.createServer(onRequest).listen(port, () => {
